@@ -1697,6 +1697,11 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  apexHeight: 2
+  apexTime: 0.5
+  maxSpeed: 7
+  timeToReachMaxSpeed: 0.3
+  timeToDecelerate: 0.3
 --- !u!4 &1433354315
 Transform:
   m_ObjectHideFlags: 0
@@ -1786,9 +1791,9 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 5
-  m_AngularDrag: 4
-  m_GravityScale: 3
+  m_LinearDrag: 0
+  m_AngularDrag: 0
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2

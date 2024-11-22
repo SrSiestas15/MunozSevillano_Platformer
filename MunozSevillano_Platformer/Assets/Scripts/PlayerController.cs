@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,19 @@ public class PlayerController : MonoBehaviour
     bool groundBellow;
     public LayerMask groundLayer;
 
+    float gravity;
+    public float apexHeight;
+    public float apexTime;
+
+    public float maxSpeed;
+    public float timeToReachMaxSpeed;
+    public float timeToDecelerate;
+    private float initialJumpVelocity;
+    private float acceleration;
+    private float deceleration;
+
+    private bool didWeJump = false;
+
     public enum FacingDirection
     {
         left, right
@@ -21,6 +35,10 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gravity = -2 * apexHeight / Mathf.Pow(apexTime, 2);
+        initialJumpVelocity = 2 * apexHeight / apexTime;
+        acceleration = maxSpeed / timeToReachMaxSpeed;
+        deceleration = maxSpeed / timeToDecelerate;
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -30,18 +48,62 @@ public class PlayerController : MonoBehaviour
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
         //manage the actual movement of the character.
         playerInput = new Vector2(Input.GetAxis("Horizontal"), 0f);
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            didWeJump = true;
+        }
     }
 
     private void FixedUpdate()
     {
         groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down, groundLayer);
+        //rb.AddForce(Vector2.up * gravity);
         //Debug.DrawLine(transform.position, transform.position + Vector3.down);
         MovementUpdate(playerInput);
     }
 
     private void MovementUpdate(Vector2 playerInput)
     {
-        rb.AddForce(playerInput * speed * 1000 * Time.fixedDeltaTime);
+
+        //accelerating
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            rb.velocity += Vector2.left * Time.deltaTime * acceleration;
+        }
+       
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            rb.velocity += Vector2.right * Time.deltaTime * acceleration;
+
+        }
+
+        //decelerating
+        if (!Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
+        {
+            rb.velocity += Vector2.ClampMagnitude(Vector2.left * Time.deltaTime * deceleration * MathF.Sign(rb.velocity.x), rb.velocity.magnitude);
+        }
+        
+        //clamping max speed
+        rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
+
+        //jump trigger
+        if (didWeJump)
+        {
+            //jump logic
+            //apex height and apex time
+
+            rb.velocity += Vector2.up * initialJumpVelocity;
+            Debug.Log("jump");
+            didWeJump = false;
+        }
+
+        //gravity
+        rb.velocity += Vector2.up * Time.deltaTime * gravity;
+    }
+
+    void Jump()
+    {
+
     }
 
     public bool IsWalking()
