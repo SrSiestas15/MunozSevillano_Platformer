@@ -25,7 +25,10 @@ public class PlayerController : MonoBehaviour
     private float acceleration;
     private float deceleration;
 
-    
+    public float terminalSpeed;
+    bool coyoteJumpPossible = true;
+    public float coyoteTime = 0;
+
 
     private bool didWeJump = false;
 
@@ -50,11 +53,27 @@ public class PlayerController : MonoBehaviour
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
         //manage the actual movement of the character.
         playerInput = new Vector2(Input.GetAxis("Horizontal"), 0f);
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if ((Input.GetKeyDown(KeyCode.UpArrow) && groundBellow) || (Input.GetKeyDown(KeyCode.UpArrow) && coyoteJumpPossible))
         {
+            coyoteJumpPossible = false;
             didWeJump = true;
         }
         Debug.DrawLine(transform.position, transform.position + Vector3.down * .70f);
+
+        if (!groundBellow)
+        {
+            coyoteTime += Time.deltaTime;
+            if (coyoteTime < .1)
+            {
+                coyoteJumpPossible = true;
+            }
+            else coyoteJumpPossible = false;
+        }
+        else
+        {
+            coyoteTime = 0;
+            coyoteJumpPossible = true;
+        }
     }
 
     private void FixedUpdate()
@@ -87,26 +106,24 @@ public class PlayerController : MonoBehaviour
             currentVelocity += Vector2.ClampMagnitude(Vector2.left * Time.deltaTime * deceleration * MathF.Sign(rb.velocity.x), rb.velocity.magnitude);
         }
 
-
-
         //clamping max speed
         currentVelocity.x = Mathf.Clamp(currentVelocity.x, -maxSpeed, maxSpeed);
+        currentVelocity.y = Mathf.Clamp(currentVelocity.y, -terminalSpeed, terminalSpeed);
         rb.velocity = currentVelocity;
 
-
         //jump trigger
-        if (didWeJump && groundBellow)
+        if (didWeJump)
         {
             //jump logic
             //apex height and apex time
 
             rb.velocity += Vector2.up * initialJumpVelocity;
-            Debug.Log("jump");
             didWeJump = false;
         }
-
+        
         //gravity
         rb.velocity += Vector2.up * Time.deltaTime * gravity;
+
     }
 
     void Jump()

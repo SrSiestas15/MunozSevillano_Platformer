@@ -1699,9 +1699,11 @@ MonoBehaviour:
     m_Bits: 8
   apexHeight: 2.5
   apexTime: 0.4
-  maxSpeed: 7
+  maxSpeed: 6
   timeToReachMaxSpeed: 0.2
   timeToDecelerate: 0.3
+  terminalSpeed: 9
+  coyoteTime: 0
 --- !u!4 &1433354315
 Transform:
   m_ObjectHideFlags: 0
