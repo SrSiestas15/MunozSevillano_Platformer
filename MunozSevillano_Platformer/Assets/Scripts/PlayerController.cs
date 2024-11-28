@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private float acceleration;
     private float deceleration;
 
+    
+
     private bool didWeJump = false;
 
     public enum FacingDirection
@@ -52,11 +54,12 @@ public class PlayerController : MonoBehaviour
         {
             didWeJump = true;
         }
+        Debug.DrawLine(transform.position, transform.position + Vector3.down * .70f);
     }
 
     private void FixedUpdate()
     {
-        groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down, groundLayer);
+        groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, groundLayer);
         //rb.AddForce(Vector2.up * gravity);
         //Debug.DrawLine(transform.position, transform.position + Vector3.down);
         MovementUpdate(playerInput);
@@ -65,29 +68,34 @@ public class PlayerController : MonoBehaviour
     private void MovementUpdate(Vector2 playerInput)
     {
 
+        Vector2 currentVelocity = rb.velocity;
+
         //accelerating
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            rb.velocity += Vector2.left * Time.deltaTime * acceleration;
+            currentVelocity += Vector2.left * Time.deltaTime * acceleration;
         }
        
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            rb.velocity += Vector2.right * Time.deltaTime * acceleration;
-
+            currentVelocity += Vector2.right * Time.deltaTime * acceleration;
         }
 
         //decelerating
         if (!Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
         {
-            rb.velocity += Vector2.ClampMagnitude(Vector2.left * Time.deltaTime * deceleration * MathF.Sign(rb.velocity.x), rb.velocity.magnitude);
+            currentVelocity += Vector2.ClampMagnitude(Vector2.left * Time.deltaTime * deceleration * MathF.Sign(rb.velocity.x), rb.velocity.magnitude);
         }
-        
+
+
+
         //clamping max speed
-        rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
+        currentVelocity.x = Mathf.Clamp(currentVelocity.x, -maxSpeed, maxSpeed);
+        rb.velocity = currentVelocity;
+
 
         //jump trigger
-        if (didWeJump)
+        if (didWeJump && groundBellow)
         {
             //jump logic
             //apex height and apex time

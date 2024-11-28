@@ -1697,10 +1697,10 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  apexHeight: 2
-  apexTime: 0.5
+  apexHeight: 2.5
+  apexTime: 0.4
   maxSpeed: 7
-  timeToReachMaxSpeed: 0.3
+  timeToReachMaxSpeed: 0.2
   timeToDecelerate: 0.3
 --- !u!4 &1433354315
 Transform:
