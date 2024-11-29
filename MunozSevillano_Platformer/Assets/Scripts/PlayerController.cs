@@ -5,6 +5,20 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public enum facingDirection
+    {
+        left, right
+    }
+    public facingDirection currentFacingDirection = facingDirection.left;
+
+    public enum CharacterState
+    {
+        idle, walk, jump, die
+    }
+    public CharacterState currentState = CharacterState.idle;
+    public CharacterState previousState = CharacterState.idle;
+
+
     Rigidbody2D rb;
     public float speed;
     Vector2 playerInput;
@@ -29,8 +43,9 @@ public class PlayerController : MonoBehaviour
     bool coyoteJumpPossible = true;
     public float coyoteTime = 0;
 
-
     private bool didWeJump = false;
+
+    public int currentHealth = 10;
 
     public enum FacingDirection
     {
@@ -50,9 +65,62 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        previousState = currentState;
+            
+        if (IsDead())
+        {
+            currentState = CharacterState.die;
+        }
+
+        switch (currentState)
+        {
+            case CharacterState.idle:
+                if (IsWalking())
+                {
+                    currentState = CharacterState.walk;
+                }
+                if (!IsGrounded())
+                {
+                    currentState = CharacterState.jump;
+                }
+                break;
+            case CharacterState.walk:
+                if (!IsWalking())
+                {
+                    currentState = CharacterState.idle;
+                }
+                if (!IsGrounded())
+                {
+                    currentState = CharacterState.jump;
+                }
+                break;
+            case CharacterState.jump:
+                if (IsGrounded())
+                {
+                    if (IsWalking())
+                    {
+                        currentState = CharacterState.walk;
+                    }
+                    else currentState = CharacterState.idle;
+                }
+                break;
+            case CharacterState.die:
+                
+                break;
+        }
+
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
         //manage the actual movement of the character.
         playerInput = new Vector2(Input.GetAxis("Horizontal"), 0f);
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            currentFacingDirection = facingDirection.left;
+        } else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            currentFacingDirection = facingDirection.right;
+        }
+
         if ((Input.GetKeyDown(KeyCode.UpArrow) && groundBellow) || (Input.GetKeyDown(KeyCode.UpArrow) && coyoteJumpPossible))
         {
             coyoteJumpPossible = false;
@@ -63,7 +131,7 @@ public class PlayerController : MonoBehaviour
         if (!groundBellow)
         {
             coyoteTime += Time.deltaTime;
-            if (coyoteTime < .1)
+            if (coyoteTime < .1 && !didWeJump)
             {
                 coyoteJumpPossible = true;
             }
@@ -126,9 +194,14 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void Jump()
+    public bool IsDead()
     {
+        return currentHealth <= 0;
+    }
 
+    public void OnDeathAnimationComplete()
+    {
+        gameObject.SetActive(false);
     }
 
     public bool IsWalking()
