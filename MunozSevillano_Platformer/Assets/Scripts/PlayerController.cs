@@ -25,10 +25,11 @@ public class PlayerController : MonoBehaviour
   
     FacingDirection lastDirection;
 
-    bool groundBellow;
+    //used to check linecast with the ground and bouncepads
     public LayerMask groundLayer;
     public LayerMask bouncepadLayer;
 
+    //used to calculate player physics
     float gravity;
     public float apexHeight;
     public float apexTime;
@@ -42,14 +43,17 @@ public class PlayerController : MonoBehaviour
     private float deceleration;
 
     public float terminalSpeed;
-    bool coyoteJumpPossible = true;
-    public float coyoteTime = 0;
-    public float dashTimer = 0;
 
+    //used to keep track of jump calculations
+    bool groundBellow;
     private bool didWeJump = false;
     private bool didWeWalljump = false;
     private bool isDashing = false;
+    public float dashTimer = 0;
+    bool coyoteJumpPossible = true;
+    public float coyoteTime = 0;
 
+    //used to bugtest "dying"
     public int currentHealth = 10;
 
     public enum FacingDirection
@@ -66,6 +70,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //physics calculated based on current value of MaxSpeed (changes often)
         gravity = -2 * apexHeight / Mathf.Pow(apexTime, 2);
         initialJumpVelocity = 2 * apexHeight / apexTime;
         acceleration = maxSpeed / timeToReachMaxSpeed;
@@ -73,11 +78,14 @@ public class PlayerController : MonoBehaviour
 
         previousState = currentState;
 
+        //runs if player presses Dash and is not already Dashing
         if (isDashing)
         {
+            //begins timer to end dash
             dashTimer += Time.deltaTime;
             if (dashTimer >= .2)
             {
+                //ends dash, resets maxSpeed
                 maxSpeed -= dashSpeed;
                 isDashing = false;
             }
@@ -126,9 +134,9 @@ public class PlayerController : MonoBehaviour
                 break;
         }
 
-        //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
-        //manage the actual movement of the character.
+        
         playerInput = new Vector2(Input.GetAxis("Horizontal"), 0f);
+
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             currentFacingDirection = facingDirection.left;
@@ -153,7 +161,6 @@ public class PlayerController : MonoBehaviour
             JumpAndDirection(Vector2.right * 10 * MathF.Sign(rb.velocity.x));
             maxSpeed += dashSpeed;
             isDashing = true;
-            //Debug.Log(MathF.Sign(rb.velocity.x));
         }
 
         if (!groundBellow)
@@ -183,6 +190,7 @@ public class PlayerController : MonoBehaviour
         }
             Debug.DrawLine(transform.position, transform.position + Vector3.left * .55f);
         
+        //walljump calculations
         if (didWeWalljump)
         {
             if (Physics2D.Linecast(transform.position, transform.position + Vector3.left * .55f, groundLayer))
@@ -196,9 +204,6 @@ public class PlayerController : MonoBehaviour
             else didWeWalljump = false;
         }
 
-
-        //rb.AddForce(Vector2.up * gravity);
-        //Debug.DrawLine(transform.position, transform.position + Vector3.down);
         MovementUpdate(playerInput);
     }
 
@@ -234,7 +239,6 @@ public class PlayerController : MonoBehaviour
         {
             //jump logic
             //apex height and apex time
-
             JumpAndDirection(Vector2.up);
             didWeJump = false;
         }
