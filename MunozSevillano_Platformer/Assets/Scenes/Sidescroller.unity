@@ -1749,9 +1749,11 @@ MonoBehaviour:
   apexHeight: 12
   apexTime: 1
   maxSpeed: 6
+  dashSpeed: 5
   timeToReachMaxSpeed: 0.2
   timeToDecelerate: 0.3
   terminalSpeed: 9
+  dashTimer: 0
   coyoteTime: 0
   currentHealth: 10
 --- !u!4 &1433354315
