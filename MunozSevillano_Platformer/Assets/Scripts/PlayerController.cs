@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     bool groundBellow;
     public LayerMask groundLayer;
+    public LayerMask bouncepadLayer;
 
     float gravity;
     public float apexHeight;
@@ -147,6 +148,11 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, groundLayer);
+        if(Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, bouncepadLayer))
+        {
+            Debug.Log("on bouncepad");
+            rb.velocity += Vector2.up * initialJumpVelocity;
+        }
         //rb.AddForce(Vector2.up * gravity);
         //Debug.DrawLine(transform.position, transform.position + Vector3.down);
         MovementUpdate(playerInput);
