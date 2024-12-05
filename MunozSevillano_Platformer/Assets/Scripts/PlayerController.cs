@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
     public float apexTime;
 
     public float maxSpeed;
+    public float dashSpeed;
     public float timeToReachMaxSpeed;
     public float timeToDecelerate;
     private float initialJumpVelocity;
@@ -43,9 +44,11 @@ public class PlayerController : MonoBehaviour
     public float terminalSpeed;
     bool coyoteJumpPossible = true;
     public float coyoteTime = 0;
+    public float dashTimer = 0;
 
     private bool didWeJump = false;
     private bool didWeWalljump = false;
+    private bool isDashing = false;
 
     public int currentHealth = 10;
 
@@ -69,6 +72,17 @@ public class PlayerController : MonoBehaviour
         deceleration = maxSpeed / timeToDecelerate;
 
         previousState = currentState;
+
+        if (isDashing)
+        {
+            dashTimer += Time.deltaTime;
+            if (dashTimer >= .2)
+            {
+                maxSpeed -= dashSpeed;
+                isDashing = false;
+            }
+        }
+        else dashTimer = 0;
             
         if (IsDead())
         {
@@ -134,12 +148,12 @@ public class PlayerController : MonoBehaviour
             didWeWalljump = true;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !isDashing)
         {
-            maxSpeed *= 2;
-        } else if (Input.GetKeyUp(KeyCode.Space))
-        {
-            maxSpeed /= 2;
+            JumpAndDirection(Vector2.right * 10 * MathF.Sign(rb.velocity.x));
+            maxSpeed += dashSpeed;
+            isDashing = true;
+            //Debug.Log(MathF.Sign(rb.velocity.x));
         }
 
         if (!groundBellow)
