@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
     public float coyoteTime = 0;
 
     private bool didWeJump = false;
+    private bool didWeWalljump = false;
 
     public int currentHealth = 10;
 
@@ -127,6 +128,11 @@ public class PlayerController : MonoBehaviour
             coyoteJumpPossible = false;
             didWeJump = true;
         }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow) && !groundBellow)
+        {
+            didWeWalljump = true;
+        }
         Debug.DrawLine(transform.position, transform.position + Vector3.down * .70f);
 
         if (!groundBellow)
@@ -148,11 +154,28 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, groundLayer);
+        
+        //jump if on bouncepad
         if(Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, bouncepadLayer))
         {
-            Debug.Log("on bouncepad");
-            rb.velocity += Vector2.up * initialJumpVelocity;
+            JumpAndDirection(Vector2.up);
         }
+            Debug.DrawLine(transform.position, transform.position + Vector3.left * .55f);
+        
+        if (didWeWalljump)
+        {
+            if (Physics2D.Linecast(transform.position, transform.position + Vector3.left * .55f, groundLayer))
+            {
+                JumpAndDirection(new Vector2(.3f, .7f));
+            }
+            else if (Physics2D.Linecast(transform.position, transform.position + Vector3.right * .55f, groundLayer))
+            {
+                JumpAndDirection(new Vector2(-.3f, .7f));
+            }
+            else didWeWalljump = false;
+        }
+
+
         //rb.AddForce(Vector2.up * gravity);
         //Debug.DrawLine(transform.position, transform.position + Vector3.down);
         MovementUpdate(playerInput);
@@ -191,7 +214,7 @@ public class PlayerController : MonoBehaviour
             //jump logic
             //apex height and apex time
 
-            rb.velocity += Vector2.up * initialJumpVelocity;
+            JumpAndDirection(Vector2.up);
             didWeJump = false;
         }
         
@@ -236,5 +259,10 @@ public class PlayerController : MonoBehaviour
             return FacingDirection.left;
         }
         else return lastDirection;
+    }
+
+    void JumpAndDirection(Vector2 jumpDirection)
+    {
+        rb.velocity += jumpDirection * initialJumpVelocity;
     }
 }
