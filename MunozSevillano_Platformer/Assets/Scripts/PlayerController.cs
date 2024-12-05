@@ -57,16 +57,16 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gravity = -2 * apexHeight / Mathf.Pow(apexTime, 2);
-        initialJumpVelocity = 2 * apexHeight / apexTime;
-        acceleration = maxSpeed / timeToReachMaxSpeed;
-        deceleration = maxSpeed / timeToDecelerate;
         rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        gravity = -2 * apexHeight / Mathf.Pow(apexTime, 2);
+        initialJumpVelocity = 2 * apexHeight / apexTime;
+        acceleration = maxSpeed / timeToReachMaxSpeed;
+        deceleration = maxSpeed / timeToDecelerate;
 
         previousState = currentState;
             
@@ -133,7 +133,14 @@ public class PlayerController : MonoBehaviour
         {
             didWeWalljump = true;
         }
-        Debug.DrawLine(transform.position, transform.position + Vector3.down * .70f);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            maxSpeed *= 2;
+        } else if (Input.GetKeyUp(KeyCode.Space))
+        {
+            maxSpeed /= 2;
+        }
 
         if (!groundBellow)
         {
