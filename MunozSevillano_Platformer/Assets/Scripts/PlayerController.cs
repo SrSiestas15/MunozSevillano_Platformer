@@ -267,7 +267,6 @@ public class PlayerController : MonoBehaviour
     }
     public bool IsGrounded()
     {
-        //Debug.Log("touching ground");
         return groundBellow;
     }
 
