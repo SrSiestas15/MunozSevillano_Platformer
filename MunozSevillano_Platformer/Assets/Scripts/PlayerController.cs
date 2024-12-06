@@ -166,7 +166,7 @@ public class PlayerController : MonoBehaviour
         if (!groundBellow)
         {
             coyoteTime += Time.deltaTime;
-            if (coyoteTime < .1 && !didWeJump)
+            if (coyoteTime < .3 && !didWeJump)
             {
                 coyoteJumpPossible = true;
             }
