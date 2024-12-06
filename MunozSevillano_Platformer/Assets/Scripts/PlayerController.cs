@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && !isDashing)
         {
-            JumpAndDirection(Vector2.right * 10 * MathF.Sign(rb.velocity.x));
+            JumpAndDirection(Vector2.right * 13 * MathF.Sign(rb.velocity.x));
             maxSpeed += dashSpeed;
             isDashing = true;
         }
@@ -166,7 +166,7 @@ public class PlayerController : MonoBehaviour
         if (!groundBellow)
         {
             coyoteTime += Time.deltaTime;
-            if (coyoteTime < .3 && !didWeJump)
+            if (coyoteTime < .1 && !didWeJump)
             {
                 coyoteJumpPossible = true;
             }
@@ -181,25 +181,24 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, groundLayer);
+        groundBellow = Physics2D.Linecast(transform.position, transform.position + Vector3.down, groundLayer);
         
         //jump if on bouncepad
-        if(Physics2D.Linecast(transform.position, transform.position + Vector3.down * .70f, bouncepadLayer))
+        if(Physics2D.Linecast(transform.position, transform.position + Vector3.down * .91f, bouncepadLayer))
         {
-            JumpAndDirection(Vector2.up);
+            JumpAndDirection(Vector2.up * 3);
         }
-            Debug.DrawLine(transform.position, transform.position + Vector3.left * .55f);
         
         //walljump calculations
         if (didWeWalljump)
         {
-            if (Physics2D.Linecast(transform.position, transform.position + Vector3.left * .55f, groundLayer))
+            if (Physics2D.Linecast(transform.position, transform.position + Vector3.left * .751f, groundLayer))
             {
-                JumpAndDirection(new Vector2(.3f, .7f));
+                JumpAndDirection(new Vector2(.3f, .7f) * 1.3f);
             }
-            else if (Physics2D.Linecast(transform.position, transform.position + Vector3.right * .55f, groundLayer))
+            else if (Physics2D.Linecast(transform.position, transform.position + Vector3.right * .751f, groundLayer))
             {
-                JumpAndDirection(new Vector2(-.3f, .7f));
+                JumpAndDirection(new Vector2(-.3f, .7f) * 1.3f);
             }
             else didWeWalljump = false;
         }
@@ -287,6 +286,6 @@ public class PlayerController : MonoBehaviour
 
     void JumpAndDirection(Vector2 jumpDirection)
     {
-        rb.velocity += jumpDirection * initialJumpVelocity;
+        rb.velocity += jumpDirection * initialJumpVelocity * 1.3f;
     }
 }
